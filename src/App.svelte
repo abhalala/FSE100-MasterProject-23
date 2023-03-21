@@ -1,47 +1,32 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+  import P5 from "p5-svelte";
+
+  import Viewport from "svelte-viewport-info";
+
+  let value = 0;
+  const sketch = (p5) => {
+    p5.setup = () => {
+      p5.createCanvas(Viewport.Width - 100, Viewport.Height - 100);
+    };
+
+    p5.draw = () => {
+      p5.fill(value);
+      p5.rect(25, 25, 50, 50);
+      p5.describe("50-by-50 black rect turns white with touch event.");
+    };
+
+    function touchStarted() {
+      if (value === 0) {
+        value = 255;
+      } else {
+        value = 0;
+      }
+    }
+  };
 </script>
 
-<main>
+<div class="border-white border-2 p-3 rounded-xl">
   <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
+    <P5 {sketch} />
   </div>
-  <h1>Vite + Svelte</h1>
-
-  <div class="card">
-    <Counter />
-  </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
-</main>
-
-<style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
-</style>
+</div>
