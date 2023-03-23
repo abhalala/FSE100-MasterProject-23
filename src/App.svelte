@@ -1,31 +1,44 @@
 <script>
   import P5 from "p5-svelte";
 
-  import Viewport from "svelte-viewport-info";
-
-  let value = 0;
+  let touchDist = 0;
+  let percentComplete = 0;
   const sketch = (p5) => {
     p5.setup = () => {
-      p5.createCanvas(Viewport.Width - 100, Viewport.Height - 100);
+      p5.createCanvas(p5.windowWidth, p5.windowHeight - 20);
+    };
+
+    p5.windowResized = () => {
+      p5.resizeCanvas(p5.windowWidth, p5.windowHeight - 20);
     };
 
     p5.draw = () => {
-      p5.fill(value);
-      p5.rect(25, 25, 50, 50);
-      p5.describe("50-by-50 black rect turns white with touch event.");
-    };
+      p5.background("black");
 
-    function touchStarted() {
-      if (value === 0) {
-        value = 255;
-      } else {
-        value = 0;
+      if (p5.touches.length >= 2) {
+        touchDist = p5.dist(
+          p5.touches[0].x,
+          p5.touches[0].y,
+          p5.touches[1].x,
+          p5.touches[1].y
+        );
+
+        percentComplete = touchDist / p5.height;
+
+        p5.fill("black");
+        if (touchDist <= 150) {
+          p5.fill("lightgreen");
+        }
+        p5.strokeWeight(1);
+        p5.stroke("white");
+        p5.circle(p5.touches[0].x, p5.touches[0].y, 150);
+        p5.circle(p5.touches[1].x, p5.touches[1].y, 150);
       }
-    }
+    };
   };
 </script>
 
-<div class="border-white border-2 p-3 rounded-xl">
+<div class="border-black bg-gray-500 text-white touch-none">
   <div>
     <P5 {sketch} />
   </div>
