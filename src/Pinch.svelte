@@ -5,11 +5,11 @@
   export let percentComplete = 0;
   const sketch = (p5) => {
     p5.setup = () => {
-      p5.createCanvas(p5.windowWidth, p5.windowHeight - 20);
+      p5.createCanvas(p5.windowWidth, p5.windowHeight - 40);
     };
 
     p5.windowResized = () => {
-      p5.resizeCanvas(p5.windowWidth, p5.windowHeight - 20);
+      p5.resizeCanvas(p5.windowWidth, p5.windowHeight - 40);
     };
 
     p5.draw = () => {
@@ -38,7 +38,7 @@
   };
 </script>
 
-<div class="border-black bg-gray-500 text-white touch-none">
+<div class="bg-gray-500 text-white touch-none h-full w-screen">
   <div>
     <P5 {sketch} />
   </div>
