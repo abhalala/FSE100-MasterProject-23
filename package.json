@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "p5-svelte": "^3.1.2",
+    "path-data-parser": "^0.1.0",
     "svelte-viewport-info": "^1.0.0"
   }
 }
