@@ -2,6 +2,7 @@
   import { writable } from "svelte/store";
   import Pinch from "./Pinch.svelte";
   import Trace from "./Trace.svelte";
+  import Jar from "./Jar.svelte";
 
   let selectedActivity = writable("select");
 </script>
@@ -113,7 +114,7 @@
     <div
       class="border-4 border-gray-400 text-white bg-black rounded-md overflow-hidden m-3"
     >
-      WIP
+      <Jar />
     </div>
   {/if}
 </div>

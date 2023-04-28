@@ -98,10 +98,8 @@
   {:else if aliveLevel.percentDone === 100}
     <h1 class="p-3 uppercase text-4xl font-bold font-sans text-green-400">
       Congratulations!
-
     </h1>
-<h1 class="p-3 uppercase text-4xl font-bold font-sans text-green-400">
-
+    <h1 class="p-3 uppercase text-4xl font-bold font-sans text-green-400">
       You've Won the game.
     </h1>
   {/if}
