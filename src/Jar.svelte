@@ -1,12 +1,20 @@
 <script>
     import P5 from "p5-svelte";
-    let initialSlopeA, initialSlopeB;
-    let a = 0,
-        b = 0;
-    let newA = 0,
-        newB = 0;
-    let aP = 0,
-        bP = 0;
+    let touchInitiated = false;
+    let lines = [
+        { currentAngle: 0, relativeAngle: null, change: 0, init: 0 },
+        { currentAngle: 0, relativeAngle: null, init: 0 },
+    ];
+    let avgCoords = { x: 0, y: 0 };
+    let absoluteChange = 0;
+    let absoluteValue = 0;
+    let incrementer = 20;
+    let won = false;
+    let check = 5;
+
+    let numberOfTurns = 0,
+        lastNoOfTurns = 0;
+
     const sketch = (p5) => {
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight - 40);
@@ -18,50 +26,120 @@
 
         p5.draw = () => {
             p5.background("black");
-            const p0 = p5.touches[0], p1 = p5.touches[1], p2 = p5.tocuhes[2], p3 = p5.touches[3];
-            a = newA;
-            b = newB;
-            const slopeA = (p0.y - p2.y) / (p0.x - p2.x);
-            const slopeB = (p1.y - p3.y) / (p1.x - p3.x);
 
-            if (slopeA > initialSlopeA) {
-                newA = slopeA - initialSlopeA;
-            } else if (slopeA < initialSlopeA) {
-                newA = initialSlopeA - slopeA;
-            }
+            if (p5.touches.length == 5) {
+                lines[0].currentAngle =
+                    (Math.atan2(
+                        p5.touches[0].y - p5.touches[2].y,
+                        p5.touches[0].x - p5.touches[2].x
+                    ) *
+                        180) /
+                    Math.PI;
 
-            if (slopeB > initialSlopeB) {
-                newB = slopeB - initialSlopeB;
-            } else if (slopeB < initialSlopeB) {
-                newB = initialSlopeB - slopeB;
-            }
+                lines[1].currentAngle =
+                    (Math.atan2(
+                        p5.touches[1].y - p5.touches[3].y,
+                        p5.touches[1].x - p5.touches[3].x
+                    ) *
+                        180) /
+                    Math.PI;
 
-            if (a > newA) {
-                aP -= 1;
-            } else if (a < newA) {
-                aP += 1;
-            }
+                if (touchInitiated) {
+                    lines.forEach((l) => {
+                        l.relativeAngle = l.init - l.currentAngle;
+                    });
 
-            if (b > newB) {
-                bP -= 1;
-            } else if (b < newB) {
-                bP += 1;
+                    absoluteChange = (lines[0].change + lines[1].change) / 2;
+                    avgCoords.x =
+                        (p5.touches[0].x +
+                            p5.touches[1].x +
+                            p5.touches[2].x +
+                            p5.touches[3].x) /
+                        4;
+                    avgCoords.y =
+                        (p5.touches[0].y +
+                            p5.touches[1].y +
+                            p5.touches[2].y +
+                            p5.touches[3].y) /
+                        4;
+
+                    absoluteValue =
+                        (Math.abs(
+                            Math.abs(lines[0].relativeAngle) +
+                                Math.abs(lines[1].relativeAngle)
+                        ) /
+                            360) *
+                        200;
+
+                    if (absoluteValue >= incrementer) {
+                        numberOfTurns =
+                            Math.floor(absoluteValue / 20) +
+                            (check > 5 && !won ? lastNoOfTurns : 0);
+                        incrementer += 20;
+                    }
+                    p5.fill(0, 200 + numberOfTurns * 10, 0);
+                    p5.circle(avgCoords.x, avgCoords.y, 100 * numberOfTurns);
+                }
             }
         };
 
         p5.touchStarted = () => {
-            initialSlopeA =
-                (p5.touches[0].y - p5.touches[2].y) /
-                (p5.touches[0].x - p5.touches[2].x);
-            initialSlopeB =
-                (p5.touches[1].y - p5.touches[3].y) /
-                (p5.touches[1].x - p5.touches[3].x);
+            if (check <= 5 || won) {
+                numberOfTurns = 0;
+            }
+            incrementer = 20;
+            if (p5.touches.length == 5) {
+                lines[0].init =
+                    (Math.atan2(
+                        p5.touches[0].y - p5.touches[2].y,
+                        p5.touches[0].x - p5.touches[2].x
+                    ) *
+                        180) /
+                    Math.PI;
+
+                lines[1].init =
+                    (Math.atan2(
+                        p5.touches[1].y - p5.touches[3].y,
+                        p5.touches[1].x - p5.touches[3].x
+                    ) *
+                        180) /
+                    Math.PI;
+
+                touchInitiated = true;
+            }
         };
+
+        p5.touchEnded = () => {
+            touchInitiated = false;
+            if (numberOfTurns >= check) won = true;
+            if (check > 5 && !won) {
+                lastNoOfTurns = numberOfTurns;
+            }
+        };
+
+        p5.touchDragged = () => {};
     };
 </script>
 
+<div class="grid justify-center">
+    <h1 class="p-2 uppercase text-5xl font-bold font-mono">
+        Score: {numberOfTurns} / {check}
+    </h1>
+    {#if won}
+        <h1 class="p-3 uppercase text-4xl font-bold font-sans text-green-400">
+            Congratulations!
+        </h1>
+        <button
+            on:click={() => {
+                won = false;
+                check += 5;
+            }}
+            class="rounded-md p-5 uppercase font-bold text-xl bg-green-500"
+            >Next Level</button
+        >
+    {/if}
+</div>
 <div class="bg-gray-500 text-white touch-none h-full w-screen">
-    aP: {aP} | bP: {bP}
     <div>
         <P5 {sketch} />
     </div>
